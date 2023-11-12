@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List, Optional, Union
 
-from deep_translator.constants import GOOGLE_LANGUAGES_TO_CODES
+from deep_translator.constants import GOOGLE_LANGUAGES_TO_CODES, BASE_URLS
 from deep_translator.exceptions import (
     InvalidSourceOrTargetLanguage,
     LanguageNotSupportedException,
@@ -176,8 +176,13 @@ class BaseTranslator(ABC):
         """
         if not batch:
             raise Exception("Enter your text list that you want to translate")
-        arr = []
-        for i, text in enumerate(batch):
+        if self.base_url == BASE_URLS.get("GOOGLE_TRANSLATE"):
+            text = '\n'.join(batch)
             translated = self.translate(text, **kwargs)
-            arr.append(translated)
+            arr = translated.split('\n');
+        else:
+            arr = []
+            for i, text in enumerate(batch):
+                translated = self.translate(text, **kwargs)
+                arr.append(translated)
         return arr
